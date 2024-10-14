@@ -1,8 +1,19 @@
+import NodeCache from 'node-cache';
+
 import { config } from './config';
 
-export async function getWeatherData() {
+const cache = new NodeCache({ stdTTL: 600 });
+
+export async function getWeatherData(city: string) {
+  const cachedData = cache.get(city);
+
+  if (cachedData) {
+    console.log('Returning cached data for', city);
+    return cachedData;
+  }
+
   const params = new URLSearchParams({
-    q: 'Gryfice',
+    q: city,
     key: config.API_KEY,
   });
 
@@ -13,6 +24,9 @@ export async function getWeatherData() {
   }
 
   const data = await response.json();
+
+  cache.set(city, data);
+  console.log('Fetching new data for', city);
 
   return data;
 }
