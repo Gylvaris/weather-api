@@ -4,12 +4,12 @@ import { config } from './config';
 
 const cache = new NodeCache({ stdTTL: 600 });
 
-export async function getWeatherData(city: string) {
+export async function getWeatherData(city: string): Promise<WeatherApiResponse> {
   const cachedData = cache.get(city);
 
   if (cachedData) {
     console.log('Returning cached data for', city);
-    return cachedData;
+    return cachedData as WeatherApiResponse;
   }
 
   const params = new URLSearchParams({
@@ -23,7 +23,7 @@ export async function getWeatherData(city: string) {
     throw new Error('Failed to fetch weather data');
   }
 
-  const data = await response.json();
+  const data = (await response.json()) as WeatherApiResponse;
 
   cache.set(city, data);
   console.log('Fetching new data for', city);
