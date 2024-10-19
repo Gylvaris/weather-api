@@ -1,10 +1,10 @@
 // Type for weather condition
-interface Condition {
+export interface Condition {
   text: string;
 }
 
 // Type for location details
-interface Location {
+export interface Location {
   name: string;
   region: string;
   country: string;
@@ -16,7 +16,7 @@ interface Location {
 }
 
 // Type for the current weather data
-interface CurrentWeather {
+export interface CurrentWeather {
   last_updated: string;
   temp_c: number;
   temp_f: number;
@@ -38,12 +38,12 @@ interface CurrentWeather {
 }
 
 // Type for the entire "data" object
-interface WeatherData {
+export interface WeatherData {
   location: Location;
   current: CurrentWeather;
 }
 
 // Root type that represents the entire JSON structure
-interface WeatherApiResponse {
+export interface WeatherApiResponse {
   data: WeatherData;
 }
