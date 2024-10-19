@@ -1,16 +1,17 @@
+import { HTTPException } from 'hono/http-exception';
 import NodeCache from 'node-cache';
 
 import { config } from './config';
-import { HTTPException } from 'hono/http-exception';
+import { currentResponseSchema, CurrentResponseSuccess } from './weather-api-schema/current-schema';
 
 const cache = new NodeCache({ stdTTL: 600 });
 
-export async function getWeatherData(city: string): Promise<WeatherApiResponse> {
+export async function getWeatherData(city: string): Promise<CurrentResponseSuccess> {
   const cachedData = cache.get(city);
 
   if (cachedData) {
     console.log('Returning cached data for', city);
-    return cachedData as WeatherApiResponse;
+    return cachedData as CurrentResponseSuccess;
   }
 
   const params = new URLSearchParams({
@@ -19,24 +20,17 @@ export async function getWeatherData(city: string): Promise<WeatherApiResponse> 
   });
 
   const response = await fetch(`http://api.weatherapi.com/v1/current.json?${params}`);
-
-  if (!response.ok) {
-    const data = await response.json();
+  
+  const data = await currentResponseSchema.parseAsync(await response.json());
+  if (!response.ok && data.error) {
     if (data.error.code === 1006) {
       throw new HTTPException(404, { message: 'Location not found' });
     }
-    if (data.error.code === 2006) {
-      throw new HTTPException(404, { message: 'Your API_KEY is invalid. Check .env' });
-    }
-    if (data.error.code === 2008) {
-      throw new HTTPException(404, { message: 'Your API_KEY has been disabled' });
-    }
-    throw new HTTPException(404, { message: 'It failed... again' });
+    console.log(data.error);
+    throw new HTTPException(500);
+  } else {
+    cache.set(city, data);
+    console.log('Fetching new data for', city);
+    return data;
   }
-
-  const data = (await response.json()) as WeatherApiResponse;
-
-  cache.set(city, data);
-  console.log('Fetching new data for', city);
-  return data;
 }
