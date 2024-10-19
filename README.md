@@ -1,4 +1,4 @@
-# Weather API - Roadmap.sh project
+# Weather API
 
 Simple weather API that fetches data from third-party service (WeatherAPI) and in-memory caching via node-cache. Build with Node.js, Hono and zod.
 
@@ -45,3 +45,5 @@ Example:
 ```
 http://localhost:3000/weather/Warsaw
 ```
+
+Inspired by https://roadmap.sh/projects/weather-api-wrapper-service
