@@ -19,6 +19,7 @@
 !.vscode/
 !flake.nix
 !flake.lock
+!README.md
 
 !src/
 
