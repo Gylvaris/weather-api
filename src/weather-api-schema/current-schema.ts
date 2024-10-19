@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { locationSchema, errorSchema } from './common-schema';
+import { errorSchema, locationSchema } from './common-schema';
 
 export const currentSchema = z.object({
   last_updated_epoch: z.number().optional(),
@@ -13,8 +13,8 @@ export const currentSchema = z.object({
     icon: z.string(),
     code: z.number(),
   }),
-  wind_mph: z.number(),
-  wind_kph: z.number().optional(),
+  wind_mph: z.number().optional(),
+  wind_kph: z.number(),
   wind_degree: z.number(),
   wind_dir: z.string(),
   pressure_mb: z.number(),
@@ -30,28 +30,26 @@ export const currentSchema = z.object({
   uv: z.number(),
   gust_mph: z.number().optional(),
   gust_kph: z.number(),
-  air_quality: z.object({
-    co: z.number(),
-    no2: z.number(),
-    o3: z.number(),
-    so2: z.number(),
-    pm2_5: z.number(),
-    pm10: z.number(),
-    'us-epa-index': z.number(),
-    'gb-defra-index': z.number(),
-  }).optional(),
+  air_quality: z
+    .object({
+      'co': z.number(),
+      'no2': z.number(),
+      'o3': z.number(),
+      'so2': z.number(),
+      'pm2_5': z.number(),
+      'pm10': z.number(),
+      'us-epa-index': z.number(),
+      'gb-defra-index': z.number(),
+    })
+    .optional(),
 });
 
 export const currentResponseSuccessSchema = z.object({
   location: locationSchema,
   current: currentSchema,
-  error: z.never(),
 });
 
-export const currentResponseSchema = z.discriminatedUnion('error', [
-  currentResponseSuccessSchema,
-  errorSchema
-])
+export const currentResponseSchema = z.union([currentResponseSuccessSchema, errorSchema]);
 
-export type CurrentResponse = z.infer<typeof currentResponseSchema >
-export type CurrentResponseSuccess = z.infer<typeof currentResponseSuccessSchema >
+export type CurrentResponse = z.infer<typeof currentResponseSchema>;
+export type CurrentResponseSuccess = z.infer<typeof currentResponseSuccessSchema>;
